@@ -1,101 +1,90 @@
 import React , { Component } from 'react';
 import DeskStyle from './MasalarStyle.css';
+import Menu from '../Menu';
+import Navbar from '../Navbar';
+
 class Masalar extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
-        }
+          data:[],
+        } 
     }
 
     componentDidMount() {
-      
+
+        var fakeData = [
+          {
+            masa_adi:'Masa 1',
+            masa_durum:'1'
+          },
+          {
+            masa_adi:'Masa 2',
+            masa_durum:'3'
+          },
+          {
+            masa_adi:'Masa 3',
+            masa_durum:'1'
+          },
+          {
+            masa_adi:'Masa 4',
+            masa_durum:'2'
+          },
+          {
+            masa_adi:'Masa 5',
+            masa_durum:'1'
+          },
+          {
+            masa_adi:'Masa 6',
+            masa_durum:'2'
+          }
+        ]
+
+        let desk = fakeData.map((masalar, key) => {
+
+          if(masalar.masa_durum == 1) {
+            return(
+              <div className="column is-3 " key={`${key}`}>
+                <a href={`detail/${key}`} style={{height:'100px'}} className={`button is-success is-large is-fullwidth`}>{masalar.masa_adi}</a>
+              </div>
+            ) 
+          }
+
+          else if(masalar.masa_durum == 2){
+            return(
+              <div className="column is-3" key={key}>
+                <a href={`detail/${key}`} style={{height:'100px'}} className={`button is-info is-large is-fullwidth`}>{masalar.masa_adi}</a>
+              </div>
+            ) 
+          }
+
+          else {
+            return(
+              <div className="column is-3" key={key}>
+                <a href={`detail/${key}`} style={{height:'100px'}} className={`button is-danger is-large is-fullwidth`}>{masalar.masa_adi}</a>
+              </div>
+            )
+          }  
+        })
+
+      this.setState({
+        data:desk
+      })  
     }
 
 
     render()  {
         return (
           <div className="desk">
-            <div class="container is-fluid">
-              <div class="columns is-multiline">
-                  <div class="column is-9 ">
-                    <div class="columns is-multiline is-mobile">
-                      <div class="column is-3 ">
-                          <a style={{height:'100px'}} class="button is-success is-large is-fullwidth">Masa 1</a>
-                      </div>
-                      <div class="column is-3 ">
-                          <a style={{height:'100px'}} class="button is-success is-large is-fullwidth">Masa 1</a>
-                      </div>
-                      <div class="column is-3 ">
-                          <a style={{height:'100px'}} class="button is-success is-large is-fullwidth">Masa 1</a>
-                      </div>
-                      <div class="column is-3 ">
-                          <a style={{height:'100px'}} class="button is-success is-large is-fullwidth">Masa 1</a>
-                      </div>
-                      <div class="column is-3 ">
-                          <a style={{height:'100px'}} class="button is-success is-large is-fullwidth">Masa 1</a>
-                      </div>
-                      <div class="column is-3 ">
-                          <a style={{height:'100px'}} class="button is-success is-large is-fullwidth">Masa 1</a>
-                      </div>
-                      <div class="column is-3 ">
-                          <a style={{height:'100px'}} class="button is-success is-large is-fullwidth">Masa 1</a>
-                      </div>
-                      <div class="column is-3 ">
-                          <a style={{height:'100px'}} class="button is-success is-large is-fullwidth">Masa 1</a>
-                      </div>
-                      <div class="column is-3 ">
-                          <a style={{height:'100px'}} class="button is-success is-large is-fullwidth">Masa 1</a>
-                      </div>
-
+            <div className="container is-fluid">
+                <Navbar />
+              <div className="columns is-multiline">
+                  <div className="column is-9 ">
+                    <div className="columns is-multiline is-mobile">
+                      {this.state.data}
                     </div>
                   </div>
-                  <div class="column is-3">
-                      <div class="columns is-multiline is-mobile">
-                        <div class="column is-12">
-                          <a style={{height:'50px'}} class="button is-info is-fullwidth "> 
-                            <i style={{marginRight:'10px'}} class="fab fa-cc-amazon-pay"></i>
-                            Kredi Kartlarını Aktar
-                          </a>
-                        </div>
-                        <div class="column is-12">
-                          <a style={{height:'50px'}} class="button is-link is-fullwidth "> 
-                            <i style={{marginRight:'10px'}} class="fas fa-shopping-basket"></i>
-                            Ürünler
-                          </a>
-                        </div>
-                        <div class="column is-12">
-                          <a style={{height:'50px'}} class="button is-primary is-fullwidth "> 
-                            <i style={{marginRight:'10px'}} class="fas fa-check"></i>
-                            Rezervasyonlar
-                          </a>
-                        </div>
-                         <div class="column is-12">
-                          <a style={{height:'50px'}} class="button is-primary is-fullwidth"> 
-                            <i style={{marginRight:'10px'}} class="fas fa-pencil-alt"></i>
-                            Hesap Düzelt
-                          </a>
-                        </div>
-                         <div class="column is-12">
-                          <a style={{height:'50px'}} class="button is-primary is-fullwidth"> 
-                            <i style={{marginRight:'10px'}} class="fas fa-plus"></i>
-                            Gider Ekle
-                          </a>
-                        </div>
-                         <div class="column is-12">
-                          <a style={{height:'50px'}} class="button is-primary is-fullwidth"> 
-                            <i style={{marginRight:'10px'}} class="fas fa-plus"></i>
-                            Gelen Ödeme
-                          </a>
-                        </div>
-                        <div class="column is-12">
-                          <a style={{height:'50px'}} class="button is-danger is-fullwidth"> 
-                            <i style={{marginRight:'10px'}} class="fas fa-lock"></i>
-                              Kapat
-                          </a>
-                        </div>
-                      </div>
-                  </div>
+                  <Menu />
               </div>
             </div>
           </div>
