@@ -13,20 +13,30 @@ class Detail extends Component {
         }
     }
 
-    subMenu(menuName) {
-        
-        var menuItem = document.getElementsByClassName('dropdown-content');
-        for(var i = 0; i < menuItem.length; i++) {
-            if(menuItem[i].innerHTML.indexOf(menuName) > -1) {
-                var item = menuItem[i];
-
-                if(item.style.display === 'none') {
-                    item.style.display = 'block';
-                }else {
-                    item.style.display = 'none';
-                }
+    contains(itemArray,searchItem) {
+        var containStatus = false;
+        for(var i = 0; i < itemArray.length; i++) {
+            if(itemArray[i] == searchItem) {
+                containStatus = true;
             }
         }
+
+        return containStatus;
+    }
+
+    subMenu(menuName,key) {
+        var dropDown = document.getElementsByClassName('dropdown')[key];
+        var dropDownSubItem = dropDown.getElementsByClassName('dropdown-content');
+
+        for(var i = 0; i < dropDownSubItem.length; i++) {
+            var subItemDisplay = dropDownSubItem[i].style.display;
+            if(subItemDisplay == 'none') {
+                dropDownSubItem[i].style.display = 'block' 
+            } else {
+                dropDownSubItem[i].style.display = 'none';
+            }
+        }
+       
     }
 
     componentDidMount() {
@@ -73,40 +83,49 @@ class Detail extends Component {
                 ürün_kategori:'Kebap',
                 ürün_stok:'20'
             },
+            {
+                ürün_id:'7',
+                ürün_adi:'Çilekli Dondurma',
+                ürün_fiyat:'12',
+                ürün_kategori:'Dondurma',
+                ürün_stok:'20'
+            },
+            {
+                ürün_id:'7',
+                ürün_adi:'Çilekli Deneme',
+                ürün_fiyat:'12',
+                ürün_kategori:'Deneme',
+                ürün_stok:'20'
+            },
         ];
 
-        var category = fakedata.map(x => {
-            return x.ürün_kategori
-        });
+        var category = [];
+        for(var i = 0; i < fakedata.length; i++) {
+            if(!this.contains(category,fakedata[i].ürün_kategori)) {
+                category.push(fakedata[i].ürün_kategori);
+            }
+        }
 
-        let kategoriler = [...new Set(category)];   
+        let data = category.map((kategori,key) => {
+                return (
+                    <div className="dropdown" key = {key} style = {{width:'100%', paddingTop:'25px'}}>
 
-
-       let data = kategoriler.map((kategori,key) => {
-            return (
-                <div 
-                    className="dropdown" 
-                    key = {key} 
-                    style = {{width:'100%', paddingTop:'25px'}}
-                    onClick = {() => this.subMenu(kategori)}
-                >
-
-                    <button style={{width:'65%'}} className="dropbtn">{kategori}</button> 
-                    {
-                        fakedata.map((ürün, key) => {
-                            if(kategori == ürün.ürün_kategori) {
-                                return (
-                                    <div id="myDropdown" style={{display:'none'}} key={key} className="dropdown-content">
-                                        <a href="#home">{ürün.ürün_adi}</a>
-                                    </div>
-                                );
-                            }
-                        })   
-                    }
-                 </div>
-            );
-        });
-        
+                        <button onClick = {() => this.subMenu(kategori,key)} style={{width:'65%'}} className="dropbtn">{kategori}</button> 
+                        {
+                            fakedata.map((ürün, key) => {
+                                if(kategori == ürün.ürün_kategori) {
+                                    return (
+                                        <div id="myDropdown" style={{display:'none'}} key={key} className="dropdown-content">
+                                            <a href="#home">{ürün.ürün_adi}</a>
+                                        </div>
+                                    );
+                                }
+                            })   
+                        }
+                    </div>
+                );
+            });
+            
         this.setState({
             data
         });
@@ -120,6 +139,39 @@ class Detail extends Component {
                     <div className="columns is-multiline">
                         <div className="column is-4" style={{height:'auto'}}>
                             {this.state.data}
+                        </div>
+                        <div className="column is-2" style={{height:'auto'}}>
+                            
+                        </div>
+                        <div className="column is-6" style={{height:'auto'}}>
+                            <div className="detail-list">
+                                <div className="detail-list-header">
+                                    <h3>Masa 1</h3>
+                                    <div className="detail-list-button">
+                                        <button className="button is-danger is-outlined">Sil(1)</button>
+                                        <button className="button is-danger ">Temizle</button>
+                                    </div>
+                                </div>
+                                <div className="detail-list-item">
+                                    <ul>
+                                        <li>
+                                            <p>1x Adana Kebap</p>
+                                            <p>20 TL</p>
+                                        </li>
+                                        <li>
+                                            <p>Adana Kebap</p>
+                                            <p>20 TL</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="detail-footer">
+                                    <h3>TOPLAM</h3>
+                                    <div className="detail-total">
+                                        <p>0.00 TL</p>
+                                        <p>0.00 TL</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -33,3 +33,94 @@
 	display: block;
 
 }
+
+.detail-list {
+    position: relative;
+    box-shadow: 0px -1px 29px -6px rgba(0,0,0,0.75);
+    margin-top: 20px;
+    width: 100%;
+    height: 50rem;
+    border-radius: 2px;
+    border:2px solid grey;
+    overflow-y: scroll;
+}
+
+.detail-list-header {
+    border-bottom: 2px solid grey;
+    height: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.detail-list-header h3 {
+    color:black;
+    padding-left: 20px;
+    font-size: 24px;
+}
+
+.detail-list-button {
+    width: 25%;
+    padding-right: 20px;
+    display: flex;
+    justify-content: space-around;
+    font-size: 24px;
+}
+
+.detail-list-button button{
+    font-size: 18px;
+}
+
+.detail-list-item {
+    width: 100%;
+    display: flex;
+}
+
+.detail-list-item ul {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.detail-list-item ul li {
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    border:1px solid grey;
+    padding: 15px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.detail-footer {
+    position: absolute;
+    bottom:0;
+    width: 100%;
+    height: 5rem;
+    border:2px solid grey;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.detail-footer h3 {
+    font-weight: 700;
+    font-size: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+} 
+
+.detail-total {
+    font-size: 20px;
+    font-weight: 700;
+    padding-right: 20px;
+    display: flex;
+    width: 25%;
+    justify-content: space-between;
+}
