@@ -83,80 +83,27 @@ class Detail extends Component {
     }
 
     componentDidMount() {
-        var fakedata = [
-            {
-                ürün_id:'1',
-                ürün_adi:'Karışık Pizza',
-                ürün_fiyat:20,
-                ürün_kategori:'Pizza',
-                ürün_stok:'50'
-            },
-            {
-                ürün_id:'2',
-                ürün_adi:'Kıymalı Pide',
-                ürün_fiyat:15,
-                ürün_kategori:'Pide',
-                ürün_stok:'30'
-            },
-            {
-                ürün_id:'3',
-                ürün_adi:'Tavuk Döner',
-                ürün_fiyat:12,
-                ürün_kategori:'Döner',
-                ürün_stok:'20'
-            },
-            {
-                ürün_id:'4',
-                ürün_adi:'Et Döner',
-                ürün_fiyat:12,
-                ürün_kategori:'Döner',
-                ürün_stok:'20'
-            },
-            {
-                ürün_id:'5',
-                ürün_adi:'Sucuklu Pizza',
-                ürün_fiyat:12,
-                ürün_kategori:'Pizza',
-                ürün_stok:'20'
-            },
-            {
-                ürün_id:'6',
-                ürün_adi:'Adana Kebap',
-                ürün_fiyat:12,
-                ürün_kategori:'Kebap',
-                ürün_stok:'20'
-            },
-            {
-                ürün_id:'7',
-                ürün_adi:'Çilekli Dondurma',
-                ürün_fiyat:12,
-                ürün_kategori:'Dondurma',
-                ürün_stok:'20'
-            },
-            {
-                ürün_id:'7',
-                ürün_adi:'Çilekli Deneme',
-                ürün_fiyat:12,
-                ürün_kategori:'Deneme',
-                ürün_stok:'20'
-            },
-        ];
 
+     
         var category = [];
-        for(var i = 0; i < fakedata.length; i++) {
-            if(!this.contains(category,fakedata[i].ürün_kategori)) {
-                category.push(fakedata[i].ürün_kategori);
-            }
-        }
 
-        let data = category.map((kategori,key) => {
+        fetch('http://localhost:3001/product')
+        .then(res => res.json())
+        .then(product => {
+            product.map(x => {
+                if(!this.contains(category,x.ürün_kategori_adi)) {
+                    category.push(x.ürün_kategori_adi);
+                }
+            })
+
+            let data = category.map((kategori,key) => {
                 return (
                     <div className="dropdown" key = {key} style = {{width:'100%', paddingTop:'25px'}}>
 
                         <button onClick = {() => this.dropdownSubMenu(kategori,key)} style={{width:'65%'}} className="dropbtn">{kategori}</button> 
                         {
-                            fakedata.map((ürün, key) => {
-                                if(kategori == ürün.ürün_kategori) {
+                            product.map((ürün, key) => {
+                                if(kategori == ürün.ürün_kategori_adi) {
                                     return (
                                         <div id="myDropdown" style={{display:'none'}} key={key} className="dropdown-content">
                                             <a onClick={() => this.detailListAction(ürün)}>{ürün.ürün_adi}</a>
@@ -169,9 +116,34 @@ class Detail extends Component {
                 );
             });
             
-        this.setState({
-            dropdownData:data
-        });
+            this.setState({
+                dropdownData:data
+            }); 
+        })
+
+        var deskId = this.props.match.params.id;
+        fetch(`http://localhost:3001/order/${deskId}`)
+        .then(res => res.json())
+        .then(order => {
+            this.setState({
+                detailListItemArray:order
+            })
+
+            var listArray = this.state.detailListItemArray;
+            var detailListTotal = 0;
+    
+            for(var i = 0; i < listArray.length; i++) {
+                detailListTotal += listArray[i].ürün_fiyat;
+            }
+    
+            this.setState({
+                detailListTotal:detailListTotal
+            })
+        })
+
+     
+
+       
     }
 
      render() {
