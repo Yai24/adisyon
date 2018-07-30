@@ -8,44 +8,41 @@ class Masalar extends Component {
         super(props);
         this.state = {
           data:[],
+          category:[]
         } 
+    }
+
+    contains(itemArray,item) {
+        var arrayStatus = false;
+
+        for(var i = 0; i < itemArray.length; i++) {
+          if(itemArray[i] == item) {
+            arrayStatus = true;
+          }
+        }
+
+        return arrayStatus;
     }
 
     componentDidMount() {
 
-        var fakeData = [
-          {
-            masa_adi:'Masa 1',
-            masa_durum:'1'
-          },
-          {
-            masa_adi:'Masa 2',
-            masa_durum:'3'
-          },
-          {
-            masa_adi:'Masa 3',
-            masa_durum:'1'
-          },
-          {
-            masa_adi:'Masa 4',
-            masa_durum:'2'
-          },
-          {
-            masa_adi:'Masa 5',
-            masa_durum:'1'
-          },
-          {
-            masa_adi:'Masa 6',
-            masa_durum:'2'
-          }
-        ]
+      var category = [];
 
-        let desk = fakeData.map((masalar, key) => {
+       fetch('http://localhost:3001/desk')
+       .then(res => res.json())
+       .then(masalar => {
+         let deskCategory = masalar.map((x, key) => {
+            if(!this.contains(category,x.masa_kategori_adi)) {
+              category.push(x.masa_kategori_adi);
+            }
+         }) 
+
+         let desk = masalar.map((masalar, key) => {
 
           if(masalar.masa_durum == 1) {
             return(
               <div className="column is-3 " key={`${key}`}>
-                <a href={`detail/${key}`} style={{height:'100px'}} className={`button is-success is-large is-fullwidth`}>{masalar.masa_adi}</a>
+                <a href={`detail/${key+1}`} style={{height:'100px'}} className={`button is-success is-large is-fullwidth`}>{masalar.masa_adi}</a>
               </div>
             ) 
           }
@@ -53,7 +50,7 @@ class Masalar extends Component {
           else if(masalar.masa_durum == 2){
             return(
               <div className="column is-3" key={key}>
-                <a href={`detail/${key}`} style={{height:'100px'}} className={`button is-info is-large is-fullwidth`}>{masalar.masa_adi}</a>
+                <a href={`detail/${key+1}`} style={{height:'100px'}} className={`button is-info is-large is-fullwidth`}>{masalar.masa_adi}</a>
               </div>
             ) 
           }
@@ -61,18 +58,19 @@ class Masalar extends Component {
           else {
             return(
               <div className="column is-3" key={key}>
-                <a href={`detail/${key}`} style={{height:'100px'}} className={`button is-danger is-large is-fullwidth`}>{masalar.masa_adi}</a>
+                <a href={`detail/${key+1}`} style={{height:'100px'}} className={`button is-danger is-large is-fullwidth`}>{masalar.masa_adi}</a>
               </div>
             )
           }  
         })
 
-      this.setState({
-        data:desk
-      })  
+          this.setState({
+            data:desk,
+            category:category
+          })         
+       })     
     }
-
-
+    
     render()  {
         return (
           <div className="desk">
@@ -80,6 +78,19 @@ class Masalar extends Component {
                 <Navbar />
               <div className="columns is-multiline">
                   <div className="column is-9 ">
+                    <div className="desk-category">
+                      <ul>
+                        <li>Tümü</li>
+                        {
+                          this.state.category.map((category,key) => {
+                            return (
+                                <li>{category}</li>
+                            )
+                          })
+                        }
+                      </ul>
+                    </div>
+                    <hr />
                     <div className="columns is-multiline is-mobile">
                       {this.state.data}
                     </div>

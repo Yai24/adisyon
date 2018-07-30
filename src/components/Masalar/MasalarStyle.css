@@ -1,3 +1,29 @@
 .desk {
 	padding-top: 1rem;
 }
+.desk-category {
+	width: 100%;
+	height: auto;
+	display: flex;
+	margin-bottom: 1rem;
+}
+
+.desk-category ul {
+	display: flex;
+}
+
+.desk-category ul li {
+	margin-left:3rem;
+	background-color:#276CDA;
+	color:#fff;
+	font-size: 16px;
+	padding:15px 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+
+.desk-category ul li:first-child {
+	margin-left: 0;
+}
