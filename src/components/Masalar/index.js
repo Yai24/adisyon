@@ -28,7 +28,7 @@ class Masalar extends Component {
 
       var category = [];
 
-       fetch('http://localhost:3001/desk')
+       fetch('http://localhost:3002/desk')
        .then(res => res.json())
        .then(masalar => {
          let deskCategory = masalar.map((x, key) => {

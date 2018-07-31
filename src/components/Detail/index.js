@@ -45,6 +45,7 @@ class Detail extends Component {
     }
     
     detailListAction(listNewItem) {
+        console.log(listNewItem);
         var listArray = this.state.detailListItemArray;
         listArray.push(listNewItem);
 
@@ -53,6 +54,21 @@ class Detail extends Component {
         for(var i = 0; i < listArray.length; i++) {
             detailListTotal += listArray[i].ürün_fiyat;
         }
+
+        fetch(`http://localhost:3002/order`, 
+            {
+                method:'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify({
+                    masaid:this.props.match.params.id,
+                    ürünid:listNewItem.ürün_id
+                })
+            }
+        )
+        .then(res => console.log(res));
 
         this.setState({
             detailListItemArray:listArray,
@@ -82,12 +98,27 @@ class Detail extends Component {
         }
     }
 
+    removeDetailList() {
+
+        this.setState({
+            detailListItemArray:[],
+            detailListTotal:0
+        })
+
+        var deskId = this.props.match.params.id;
+        console.log(deskId);
+        fetch(`http://localhost:3002/order/${deskId}`, {
+             method:'delete'
+        })
+        .then(res => console.log(res));
+    }
+
     componentDidMount() {
 
      
         var category = [];
 
-        fetch('http://localhost:3001/product')
+        fetch('http://localhost:3002/product')
         .then(res => res.json())
         .then(product => {
             product.map(x => {
@@ -122,7 +153,7 @@ class Detail extends Component {
         })
 
         var deskId = this.props.match.params.id;
-        fetch(`http://localhost:3001/order/${deskId}`)
+        fetch(`http://localhost:3002/order/${deskId}`)
         .then(res => res.json())
         .then(order => {
             this.setState({
@@ -164,7 +195,9 @@ class Detail extends Component {
                                     <h3>Masa {this.props.match.params.id}</h3>
                                     <div className="detail-list-button">
                                         <button className="button is-danger is-outlined">Sil({this.state.detailListRemoveIndis})</button>
-                                        <button className="button is-danger ">Temizle</button>
+                                        <button className="button is-danger" onClick={() => {this.removeDetailList() }} >
+                                            Temizle
+                                        </button>
                                     </div>
                                 </div>
                                 <div className="detail-list-item">
