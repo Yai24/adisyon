@@ -1,3 +1,4 @@
 <h1 align="center"> Kullanılan Teknolojiler </h1> <br>
 
-![header](https://user-images.githubusercontent.com/23511412/43915114-66d150a2-9c12-11e8-9e35-3d7834b06fb0.png)
+![teknolojiler](https://user-images.githubusercontent.com/23511412/43915254-d1d2f446-9c12-11e8-8470-3cfff25f75f1.png)
+
