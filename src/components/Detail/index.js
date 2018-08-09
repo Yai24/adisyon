@@ -114,7 +114,6 @@ class Detail extends Component {
     }
 
     componentDidMount() {
-
      
         var category = [];
 

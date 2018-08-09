@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-
+import Sidebar from '../Sidebar';
 class Dashboard extends Component {
 
     render() {
         return(
             <div>
-                Admin anasayfa
+                <Sidebar />
             </div>
         )
     }
