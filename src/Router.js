@@ -5,13 +5,19 @@ import Masalar from './components/Masalar';
 import Detail  from './components/Detail';
 import Admin from './admin';
 import Dashboard from './admin/Dashboard';
-
+import Login from './components/Login';
 
 class BrowserRouter extends Component {
     render() {
         return (
         <Router>
             <div>
+                <Route
+                    path="/"
+                    exact
+                    component={Login}
+                />
+
                 <Route
                     path="/desk"
                     exact

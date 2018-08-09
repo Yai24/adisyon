@@ -41,14 +41,12 @@ class Masalar extends Component {
         }) 
 
         let desk = masalar.map((masalar, key) => {
-          
          if(masalar.masa_kategori_adi == this.state.masaCategory) {
-
            var item = [];
            if(masalar.masa_durum == 1) {
              item =  (
                <div className="column is-3 " key={`${key}`} category={`${masalar.masa_kategori_adi}`}>
-                 <a href={`detail/${key+1}`} style={{height:'100px'}}  className={`button is-success is-large is-fullwidth`}>{masalar.masa_adi}</a>
+                 <a href={`detail/${masalar.masa_id}`} style={{height:'100px'}}  className={`button is-success is-large is-fullwidth`}>{masalar.masa_adi}</a>
                </div>
              )
            }
@@ -56,7 +54,7 @@ class Masalar extends Component {
            else if(masalar.masa_durum == 2){
              item = (
                <div className="column is-3" key={key} category={`${masalar.masa_kategori_adi}`}>
-                 <a href={`detail/${key+1}`} style={{height:'100px'}} category={masalar.masa_kategori_adi}  className={`button is-info is-large is-fullwidth`}>{masalar.masa_adi}</a>
+                 <a href={`detail/${masalar.masa_id}`} style={{height:'100px'}} category={masalar.masa_kategori_adi}  className={`button is-info is-large is-fullwidth`}>{masalar.masa_adi}</a>
                </div>
              ) 
            }
@@ -64,7 +62,7 @@ class Masalar extends Component {
            else {
              item = (
                <div className="column is-3" key={key} category={`${masalar.masa_kategori_adi}`}>
-                 <a href={`detail/${key+1}`} style={{height:'100px'}} category={masalar.masa_kategori_adi}  className={`button is-danger is-large is-fullwidth`}>{masalar.masa_adi}</a>
+                 <a href={`detail/${masalar.masa_id}`} style={{height:'100px'}} category={masalar.masa_kategori_adi}  className={`button is-danger is-large is-fullwidth`}>{masalar.masa_adi}</a>
                </div>
              )
            }
