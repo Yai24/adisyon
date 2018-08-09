@@ -8,8 +8,12 @@ class Masalar extends Component {
         super(props);
         this.state = {
           data:[],
-          category:[]
+          category:[],
+          masaCategory:'Bahçe'
         } 
+
+        this.categoryChange = this.categoryChange.bind(this);
+        this.getData = this.getData.bind(this);
     }
 
     contains(itemArray,item) {
@@ -24,51 +28,68 @@ class Masalar extends Component {
         return arrayStatus;
     }
 
-    componentDidMount() {
-
+    getData() {
       var category = [];
 
-       fetch('http://localhost:3002/desk')
-       .then(res => res.json())
-       .then(masalar => {
-         let deskCategory = masalar.map((x, key) => {
-            if(!this.contains(category,x.masa_kategori_adi)) {
-              category.push(x.masa_kategori_adi);
-            }
-         }) 
+      fetch('http://localhost:3002/desk')
+      .then(res => res.json())
+      .then(masalar => {
+        let deskCategory = masalar.map((x, key) => {
+           if(!this.contains(category,x.masa_kategori_adi)) {
+             category.push(x.masa_kategori_adi);
+           }
+        }) 
 
-         let desk = masalar.map((masalar, key) => {
+        let desk = masalar.map((masalar, key) => {
+          
+         if(masalar.masa_kategori_adi == this.state.masaCategory) {
 
-          if(masalar.masa_durum == 1) {
-            return(
-              <div className="column is-3 " key={`${key}`}>
-                <a href={`detail/${key+1}`} style={{height:'100px'}} className={`button is-success is-large is-fullwidth`}>{masalar.masa_adi}</a>
-              </div>
-            ) 
-          }
+           var item = [];
+           if(masalar.masa_durum == 1) {
+             item =  (
+               <div className="column is-3 " key={`${key}`} category={`${masalar.masa_kategori_adi}`}>
+                 <a href={`detail/${key+1}`} style={{height:'100px'}}  className={`button is-success is-large is-fullwidth`}>{masalar.masa_adi}</a>
+               </div>
+             )
+           }
+ 
+           else if(masalar.masa_durum == 2){
+             item = (
+               <div className="column is-3" key={key} category={`${masalar.masa_kategori_adi}`}>
+                 <a href={`detail/${key+1}`} style={{height:'100px'}} category={masalar.masa_kategori_adi}  className={`button is-info is-large is-fullwidth`}>{masalar.masa_adi}</a>
+               </div>
+             ) 
+           }
+ 
+           else {
+             item = (
+               <div className="column is-3" key={key} category={`${masalar.masa_kategori_adi}`}>
+                 <a href={`detail/${key+1}`} style={{height:'100px'}} category={masalar.masa_kategori_adi}  className={`button is-danger is-large is-fullwidth`}>{masalar.masa_adi}</a>
+               </div>
+             )
+           }
+         }           
 
-          else if(masalar.masa_durum == 2){
-            return(
-              <div className="column is-3" key={key}>
-                <a href={`detail/${key+1}`} style={{height:'100px'}} className={`button is-info is-large is-fullwidth`}>{masalar.masa_adi}</a>
-              </div>
-            ) 
-          }
+         return item;
+       })
 
-          else {
-            return(
-              <div className="column is-3" key={key}>
-                <a href={`detail/${key+1}`} style={{height:'100px'}} className={`button is-danger is-large is-fullwidth`}>{masalar.masa_adi}</a>
-              </div>
-            )
-          }  
-        })
+         this.setState({
+           data:{masalar,desk},
+           category:category
+         })         
+      })     
+    }
 
-          this.setState({
-            data:desk,
-            category:category
-          })         
-       })     
+    categoryChange(e) {
+      this.setState({
+       masaCategory:e.target.innerHTML
+      })
+
+      this.getData();
+     }
+
+    componentDidMount() {
+      this.getData();
     }
     
     render()  {
@@ -80,11 +101,10 @@ class Masalar extends Component {
                   <div className="column is-9 ">
                     <div className="desk-category">
                       <ul>
-                        <li>Tümü</li>
                         {
                           this.state.category.map((category,key) => {
                             return (
-                                <li>{category}</li>
+                                <li key={key} onClick={(e) => this.categoryChange(e)}>{category}</li>
                             )
                           })
                         }
@@ -92,7 +112,9 @@ class Masalar extends Component {
                     </div>
                     <hr />
                     <div className="columns is-multiline is-mobile">
-                      {this.state.data}
+                      { 
+                        this.state.data['desk']
+                      }
                     </div>
                   </div>
                   <Menu />
