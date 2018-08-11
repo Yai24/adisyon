@@ -12,7 +12,8 @@ class Detail extends Component {
             detailListItemArray:[],
             detailListTotal: 0,
             detailRemoveListTotal: 0,
-            detailListRemoveIndis:0
+            detailListRemoveIndis:0,
+            token:null
         }
 
         this.detailListItemColor = this.detailListItemColor.bind(this);
@@ -45,7 +46,6 @@ class Detail extends Component {
     }
     
     detailListAction(listNewItem) {
-        console.log(listNewItem);
         var listArray = this.state.detailListItemArray;
         listArray.push(listNewItem);
 
@@ -55,17 +55,19 @@ class Detail extends Component {
             detailListTotal += listArray[i].ürün_fiyat;
         }
 
-        fetch(`http://localhost:3002/order`, 
+        fetch(`http://localhost:3002/api/order`, 
             {
                 method:'POST',
                 headers: {
-                    'Accept': 'application/json, text/plain, */*',
-                    'Content-Type': 'application/json'
+                    'Content-Type':'application/x-www-form-urlencoded',
+                    'x-access-token':localStorage.getItem('token')
                 },
-                body:JSON.stringify({
+                body:`masaid=${encodeURI(this.props.match.params.id)}&ürünid=${encodeURI(listNewItem.ürün_id)}`
+
+                /*JSON.stringify({
                     masaid:this.props.match.params.id,
                     ürünid:listNewItem.ürün_id
-                })
+                })*/
             }
         )
         .then(res => console.log(res));
@@ -107,72 +109,91 @@ class Detail extends Component {
 
         var deskId = this.props.match.params.id;
         console.log(deskId);
-        fetch(`http://localhost:3002/order/${deskId}`, {
-             method:'delete'
+        fetch(`http://localhost:3002/api/order/${deskId}`, {
+             method:'delete',
+             headers: {
+                'Content-Type':'application/x-www-form-urlencoded',
+                'x-access-token':localStorage.getItem('token')
+             }
         })
         .then(res => console.log(res));
     }
 
     componentDidMount() {
-     
-        var category = [];
 
-        fetch('http://localhost:3002/product')
-        .then(res => res.json())
-        .then(product => {
-            product.map(x => {
-                if(!this.contains(category,x.ürün_kategori_adi)) {
-                    category.push(x.ürün_kategori_adi);
+        if(localStorage.getItem('token') !== null) {
+            var category = [];
+
+            fetch('http://localhost:3002/api/product', {
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded',
+                    'x-access-token':localStorage.getItem('token')
                 }
             })
-
-            let data = category.map((kategori,key) => {
-                return (
-                    <div className="dropdown" key = {key} style = {{width:'100%', paddingTop:'25px'}}>
-
-                        <button onClick = {() => this.dropdownSubMenu(kategori,key)} style={{width:'65%'}} className="dropbtn">{kategori}</button> 
-                        {
-                            product.map((ürün, key) => {
-                                if(kategori == ürün.ürün_kategori_adi) {
-                                    return (
-                                        <div id="myDropdown" style={{display:'none'}} key={key} className="dropdown-content">
-                                            <a onClick={() => this.detailListAction(ürün)}>{ürün.ürün_adi}</a>
-                                        </div>
-                                    );
-                                }
-                            })   
-                        }
-                    </div>
-                );
-            });
-            
-            this.setState({
-                dropdownData:data
-            }); 
-        })
-
-        var deskId = this.props.match.params.id;
-        fetch(`http://localhost:3002/order/${deskId}`)
-        .then(res => res.json())
-        .then(order => {
-            this.setState({
-                detailListItemArray:order
-            })
-
-            var listArray = this.state.detailListItemArray;
-            var detailListTotal = 0;
+            .then(res => res.json())
+            .then(product => {
+                product.map(x => {
+                    if(!this.contains(category,x.ürün_kategori_adi)) {
+                        category.push(x.ürün_kategori_adi);
+                    }
+                })
     
-            for(var i = 0; i < listArray.length; i++) {
-                detailListTotal += listArray[i].ürün_fiyat;
-            }
+                let data = category.map((kategori,key) => {
+                    return (
+                        <div className="dropdown" key = {key} style = {{width:'100%', paddingTop:'25px'}}>
     
-            this.setState({
-                detailListTotal:detailListTotal
+                            <button onClick = {() => this.dropdownSubMenu(kategori,key)} style={{width:'80%'}} className="dropbtn">{kategori}</button> 
+                            {
+                                product.map((ürün, key) => {
+                                    if(kategori == ürün.ürün_kategori_adi) {
+                                        return (
+                                            <div id="myDropdown" style={{display:'none'}} key={key} className="dropdown-content">
+                                                <a onClick={() => this.detailListAction(ürün)}>{ürün.ürün_adi}</a>
+                                            </div>
+                                        );
+                                    }
+                                })   
+                            }
+                        </div>
+                    );
+                });
+                
+                this.setState({
+                    dropdownData:data
+                }); 
             })
-        })
-
+    
+            var deskId = this.props.match.params.id;
+            fetch(`http://localhost:3002/api/order/${deskId}`,{
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded',
+                    'x-access-token':localStorage.getItem('token')
+                }
+            })
+            .then(res => res.json())
+            .then(order => {
+                this.setState({
+                    detailListItemArray:order
+                })
+    
+                var listArray = this.state.detailListItemArray;
+                var detailListTotal = 0;
+        
+                for(var i = 0; i < listArray.length; i++) {
+                    detailListTotal += listArray[i].ürün_fiyat;
+                }
+        
+                this.setState({
+                    detailListTotal:detailListTotal
+                })
+            })
+        }else {
+            this.props.history.push('/')
+        }
      
-
+       
        
     }
 
@@ -182,14 +203,32 @@ class Detail extends Component {
                 <div className="container is-fluid">
                     <Navbar />
                     <div className="columns is-multiline">
-                        <div className="column is-4" style={{height:'auto'}}>
+                        <div className="column is-3" style={{height:'auto'}}>
                             {this.state.dropdownData}
                         </div>
-                        <div className="column is-2" style={{height:'auto'}}>
-                            
+                        <div className="column is-4" style={{height:'auto'}}>
+
+                            <div className="product-name">
+                                <h1 class="subtitle is-5">Ürün Adı:</h1>
+                            </div>
+                            <hr />    
+                            <div className="product-adet">
+                                <h1 class="subtitle is-5">Ürün Adet</h1>
+                                <input class="input is-info" type="number" placeholder="1" />
+                            </div>
+                            <hr />
+                            <div className="product-not">
+                                <h1 class="subtitle is-5">Ürün Not</h1>
+                                <textarea class="textarea is-info" rows="5" cols="100" type="text" placeholder="Not"></textarea>
+                            </div>
+                            <hr />
+                            <div className="product-button">
+                                <a class="button is-primary">Siparişi Onayla </a>
+                                <a class="button is-danger">Siparişi İptal Et</a>
+                            </div>
                         </div>
-                        <div className="column is-6" style={{height:'auto'}}>
-                            <div className="detail-list">
+                        <div className="column is-5" style={{height:'auto'}}>
+                            <div className="detail-list" style={{overflowX:'hidden'}}>
                                 <div className="detail-list-header">
                                     <h3>Masa {this.props.match.params.id}</h3>
                                     <div className="detail-list-button">
@@ -205,7 +244,7 @@ class Detail extends Component {
                                             this.state.detailListItemArray.map((item,key) => {
                                                 return (
                                                     <li key = {key} onClick = {(e) => this.detailListItemColor(e,item)}>
-                                                        <p>{item.ürün_adi}</p>
+                                                        <p disabled>{item.ürün_adi}</p>
                                                         <p>{item.ürün_fiyat} TL</p>
                                                      </li>
                                                 )

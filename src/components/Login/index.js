@@ -69,6 +69,12 @@ class Login extends Component {
         })
     }
 
+    componentDidMount() {
+        if(localStorage.getItem('token') !== null) {
+            this.props.history.push('/desk');
+        } 
+    }
+
     render() {
         return(
             <div className="container-login">
