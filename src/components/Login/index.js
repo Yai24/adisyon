@@ -42,13 +42,16 @@ class Login extends Component {
         .then(res => res.json())
         .then(data => {
             if(data.status) {
-                console.log(data)
                 swal({
                     title: 'Giriş Başarılı',
                     type: 'success',
                     timer:1000
                   })
                 localStorage.setItem('token', data.token);
+                
+                setTimeout(() => {
+                    this.props.history.push('/desk');
+                },1200)
             }else {
                 swal({
                     title: 'Giriş Başarısız',
@@ -64,7 +67,6 @@ class Login extends Component {
                 timer:1000
               })
         })
-        
     }
 
     render() {

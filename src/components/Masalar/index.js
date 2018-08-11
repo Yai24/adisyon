@@ -9,7 +9,7 @@ class Masalar extends Component {
         this.state = {
           data:[],
           category:[],
-          masaCategory:'Bahçe'
+          masaCategory:'Bahçe',
         } 
 
         this.categoryChange = this.categoryChange.bind(this);
@@ -31,7 +31,14 @@ class Masalar extends Component {
     getData() {
       var category = [];
 
-      fetch('http://localhost:3002/desk')
+      if(localStorage.getItem('token') !== null) {
+        fetch('http://localhost:3002/api/desk',{
+        method:'GET',
+        headers: {
+          'Content-Type':'application/x-www-form-urlencoded',
+          'x-access-token':localStorage.getItem('token')
+        }
+      })
       .then(res => res.json())
       .then(masalar => {
         let deskCategory = masalar.map((x, key) => {
@@ -72,10 +79,14 @@ class Masalar extends Component {
        })
 
          this.setState({
-           data:{masalar,desk},
-           category:category
-         })         
-      })     
+            data:{masalar,desk},
+            category:category
+          })         
+        }) 
+      }
+      else {
+        this.props.history.push('/');
+      }
     }
 
     categoryChange(e) {
@@ -84,7 +95,7 @@ class Masalar extends Component {
       })
 
       this.getData();
-     }
+    }
 
     componentDidMount() {
       this.getData();
