@@ -84,6 +84,7 @@ class Masalar extends Component {
           })         
         }) 
       }
+      
       else {
         this.props.history.push('/');
       }

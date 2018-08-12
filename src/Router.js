@@ -6,6 +6,7 @@ import Detail  from './components/Detail';
 import Admin from './admin';
 import Dashboard from './admin/Dashboard';
 import Login from './components/Login';
+import Products from './components/Products';
 
 class BrowserRouter extends Component {
     render() {
@@ -28,6 +29,12 @@ class BrowserRouter extends Component {
                     path="/detail/:id"
                     exact
                     component={Detail}
+                />
+
+                <Route
+                    path="/products"
+                    exact
+                    component={Products}
                 />
 
                 <Route

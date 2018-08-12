@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import DetailStyle from './DetailStyle.css';
 import Navbar from '../Navbar';
 
-
 class Detail extends Component {
 
     constructor(props) {
@@ -13,10 +12,98 @@ class Detail extends Component {
             detailListTotal: 0,
             detailRemoveListTotal: 0,
             detailListRemoveIndis:0,
-            token:null
+            token:null,
+            productName:'',
+            productSalary:0,
+            productAdet:1,
+            productNot:'',
+            currentItem:[]
         }
 
         this.detailListItemColor = this.detailListItemColor.bind(this);
+    }
+
+    getData() {
+        if(localStorage.getItem('token') !== null) {
+            var category = [];
+
+            fetch('http://localhost:3002/api/product', {
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded',
+                    'x-access-token':localStorage.getItem('token')
+                }
+            })
+            .then(res => res.json())
+            .then(product => {
+                product.map(x => {
+                    if(!this.contains(category,x.ürün_kategori_adi)) {
+                        category.push(x.ürün_kategori_adi);
+                    }
+                })
+    
+                let data = category.map((kategori,key) => {
+                    return (
+                        <div className="dropdown" key = {key} style = {{width:'100%', paddingTop:'25px'}}>
+    
+                            <button onClick = {() => this.dropdownSubMenu(kategori,key)} style={{width:'80%'}} className="dropbtn">{kategori}</button> 
+                            {
+                                product.map((ürün, key) => {
+                                    if(kategori == ürün.ürün_kategori_adi) {
+                                        return (
+                                            <div id="myDropdown" style={{display:'none'}} key={key} className="dropdown-content">
+                                                <a onClick={(e) => {
+                                                    this.changeProductName(e, ürün)
+                                                    }}>{ürün.ürün_adi}</a>
+                                            </div>
+                                        );
+                                    }
+                                })   
+                            }
+                        </div>
+                    );
+                });
+                
+                this.setState({
+                    dropdownData:data
+                }); 
+            })
+    
+            var deskId = this.props.match.params.id;
+            fetch(`http://localhost:3002/api/order/${deskId}`,{
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded',
+                    'x-access-token':localStorage.getItem('token')
+                }
+            })
+            .then(res => res.json())
+            .then(order => {
+                var total = 0;
+                let data = order.map((x,key) => {
+                    total += x.siparis_fiyat;
+                    return x;
+                })
+
+                this.setState({
+                    detailListTotal:total,
+                    detailListItemArray:data
+                })
+            })
+        }else {
+            this.props.history.push('/')
+        }
+    }
+
+    detailListAction(item) {
+        item.siparis_adet = this.state.productAdet;
+        item.siparis_fiyat = this.state.currentItem.ürün_fiyat * this.state.productAdet;
+        var arrayList = this.state.detailListItemArray.push(item);
+        
+        this.setState({
+            currentItem:arrayList,
+            detailListTotal:this.state.detailListTotal + this.state.currentItem.ürün_fiyat * this.state.productAdet
+        })
     }
 
     contains(itemArray,searchItem) {
@@ -42,39 +129,55 @@ class Detail extends Component {
                 dropDownSubItem[i].style.display = 'none';
             }
         }
-       
     }
-    
-    detailListAction(listNewItem) {
-        var listArray = this.state.detailListItemArray;
-        listArray.push(listNewItem);
 
-        var detailListTotal = 0;
+    orderInsert() {
 
-        for(var i = 0; i < listArray.length; i++) {
-            detailListTotal += listArray[i].ürün_fiyat;
-        }
+        if(this.state.productName !== '') {
+            this.detailListAction(this.state.currentItem);
 
-        fetch(`http://localhost:3002/api/order`, 
-            {
-                method:'POST',
-                headers: {
-                    'Content-Type':'application/x-www-form-urlencoded',
-                    'x-access-token':localStorage.getItem('token')
-                },
-                body:`masaid=${encodeURI(this.props.match.params.id)}&ürünid=${encodeURI(listNewItem.ürün_id)}`
-
-                /*JSON.stringify({
-                    masaid:this.props.match.params.id,
-                    ürünid:listNewItem.ürün_id
-                })*/
+            var orderItem = {
+                masaid:this.props.match.params.id,
+                ürünid:this.state.currentItem.ürün_id,
+                siparisAdet:this.state.productAdet,
+                siparisFiyat:this.state.currentItem.ürün_fiyat * this.state.productAdet,
+                siparisNot:this.state.productNot
             }
-        )
-        .then(res => console.log(res));
 
+            fetch(`http://localhost:3002/api/order`, 
+                {
+                    method:'POST',
+                    headers: {
+                        'Content-Type':'application/x-www-form-urlencoded',
+                        'x-access-token':localStorage.getItem('token')
+                    },
+                    body:`masaid=${encodeURI(this.props.match.params.id)}&ürünid=${encodeURI(orderItem.ürünid)}&siparisadet=${encodeURI(orderItem.siparisAdet)}&siparisfiyat=${encodeURI(orderItem.siparisFiyat)}&siparisnot=${encodeURI(orderItem.siparisNot)}`
+                }
+            )
+            .then(res => console.log(res));
+        }else {
+            console.log('ilker');
+        }
+        
+        
+    }
+
+    changeProductName(e, item) {
         this.setState({
-            detailListItemArray:listArray,
-            detailListTotal:detailListTotal
+            productName:e.target.innerHTML,
+            currentItem:item
+        })        
+    }
+
+    changeProductAdet(e) {
+        this.setState({
+            productAdet:e.target.value
+        })
+    }
+
+    changeProductNot(e) {
+        this.setState({
+            productNot:e.target.value
         })
     }
 
@@ -120,81 +223,9 @@ class Detail extends Component {
     }
 
     componentDidMount() {
+        this.getData();
 
-        if(localStorage.getItem('token') !== null) {
-            var category = [];
-
-            fetch('http://localhost:3002/api/product', {
-                method:'GET',
-                headers:{
-                    'Content-Type':'application/x-www-form-urlencoded',
-                    'x-access-token':localStorage.getItem('token')
-                }
-            })
-            .then(res => res.json())
-            .then(product => {
-                product.map(x => {
-                    if(!this.contains(category,x.ürün_kategori_adi)) {
-                        category.push(x.ürün_kategori_adi);
-                    }
-                })
-    
-                let data = category.map((kategori,key) => {
-                    return (
-                        <div className="dropdown" key = {key} style = {{width:'100%', paddingTop:'25px'}}>
-    
-                            <button onClick = {() => this.dropdownSubMenu(kategori,key)} style={{width:'80%'}} className="dropbtn">{kategori}</button> 
-                            {
-                                product.map((ürün, key) => {
-                                    if(kategori == ürün.ürün_kategori_adi) {
-                                        return (
-                                            <div id="myDropdown" style={{display:'none'}} key={key} className="dropdown-content">
-                                                <a onClick={() => this.detailListAction(ürün)}>{ürün.ürün_adi}</a>
-                                            </div>
-                                        );
-                                    }
-                                })   
-                            }
-                        </div>
-                    );
-                });
-                
-                this.setState({
-                    dropdownData:data
-                }); 
-            })
-    
-            var deskId = this.props.match.params.id;
-            fetch(`http://localhost:3002/api/order/${deskId}`,{
-                method:'GET',
-                headers:{
-                    'Content-Type':'application/x-www-form-urlencoded',
-                    'x-access-token':localStorage.getItem('token')
-                }
-            })
-            .then(res => res.json())
-            .then(order => {
-                this.setState({
-                    detailListItemArray:order
-                })
-    
-                var listArray = this.state.detailListItemArray;
-                var detailListTotal = 0;
-        
-                for(var i = 0; i < listArray.length; i++) {
-                    detailListTotal += listArray[i].ürün_fiyat;
-                }
-        
-                this.setState({
-                    detailListTotal:detailListTotal
-                })
-            })
-        }else {
-            this.props.history.push('/')
-        }
-     
-       
-       
+        <Navbar />
     }
 
      render() {
@@ -209,21 +240,21 @@ class Detail extends Component {
                         <div className="column is-4" style={{height:'auto'}}>
 
                             <div className="product-name">
-                                <h1 class="subtitle is-5">Ürün Adı:</h1>
+                                <h1 class="subtitle is-5">Ürün Adı: {this.state.productName}</h1>
                             </div>
                             <hr />    
                             <div className="product-adet">
                                 <h1 class="subtitle is-5">Ürün Adet</h1>
-                                <input class="input is-info" type="number" placeholder="1" />
+                                <input onChange={(e) => this.changeProductAdet(e)} class="input is-info" type="number" placeholder="1" />
                             </div>
                             <hr />
                             <div className="product-not">
                                 <h1 class="subtitle is-5">Ürün Not</h1>
-                                <textarea class="textarea is-info" rows="5" cols="100" type="text" placeholder="Not"></textarea>
+                                <textarea onChange = {(e) => this.changeProductNot(e)} class="textarea is-info" rows="5" cols="100" type="text" placeholder="Not"></textarea>
                             </div>
                             <hr />
                             <div className="product-button">
-                                <a class="button is-primary">Siparişi Onayla </a>
+                                <a onClick = {() => this.orderInsert()} class="button is-primary">Siparişi Onayla </a>
                                 <a class="button is-danger">Siparişi İptal Et</a>
                             </div>
                         </div>
@@ -244,8 +275,19 @@ class Detail extends Component {
                                             this.state.detailListItemArray.map((item,key) => {
                                                 return (
                                                     <li key = {key} onClick = {(e) => this.detailListItemColor(e,item)}>
-                                                        <p disabled>{item.ürün_adi}</p>
-                                                        <p>{item.ürün_fiyat} TL</p>
+
+                                                        <div className="siparis_adet" style={{width:'30%'}}>
+                                                            <p disabled>{item.siparis_adet} Adet</p>
+                                                        </div>
+                                                            
+                                                        <div style={{width:'30%',display:'flex',justifyContent:'start'}} className="ürün_ad">
+                                                            <p disabled>{item.ürün_adi}</p>
+                                                        </div>
+
+                                                         <div className="siparis_adet" style={{width:'30%',display:'flex',justifyContent:'flex-end'}}>
+                                                            <p>{item.siparis_fiyat} TL</p>
+                                                        </div>
+                                                       
                                                      </li>
                                                 )
                                             })
