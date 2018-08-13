@@ -48,7 +48,7 @@ class Menu extends Component {
                         </a>
                     </div>
                     <div className="column is-12">
-                        <a onClick={() => this.logOut()} style={{height:'50px',width:'80%',marginLeft:'auto'}} className="button is-danger is-fullwidth"> 
+                        <a onClick={() => this.logOut()} style={{height:'50px',width:'80%',marginLeft:'auto'    }} className="button is-danger is-fullwidth"> 
                             <div style={{width:'20%',display:'flex',alignItems:'center',justifyContent:'space-between',paddingRight:'30%'}}> 
                                 <i style={{marginRight:'10px'}} className="fas fa-lock"></i>
                                 <span>Çıkış</span>

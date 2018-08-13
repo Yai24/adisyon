@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import DetailStyle from './DetailStyle.css';
 import Navbar from '../Navbar';
+import swal from 'sweetalert2';
 
 class Detail extends Component {
 
@@ -44,22 +45,22 @@ class Detail extends Component {
     
                 let data = category.map((kategori,key) => {
                     return (
-                        <div className="dropdown" key = {key} style = {{width:'100%', paddingTop:'25px'}}>
-    
-                            <button onClick = {() => this.dropdownSubMenu(kategori,key)} style={{width:'80%'}} className="dropbtn">{kategori}</button> 
-                            {
-                                product.map((ürün, key) => {
-                                    if(kategori == ürün.ürün_kategori_adi) {
-                                        return (
-                                            <div id="myDropdown" style={{display:'none'}} key={key} className="dropdown-content">
-                                                <a onClick={(e) => {
-                                                    this.changeProductName(e, ürün)
-                                                    }}>{ürün.ürün_adi}</a>
-                                            </div>
-                                        );
-                                    }
-                                })   
-                            }
+                            <div className="dropdown" key = {key} style = {{width:'100%', paddingTop:'25px'}}>
+        
+                                <button onClick = {() => this.dropdownSubMenu(kategori,key)} style={{width:'80%'}} className="dropbtn">{kategori}</button> 
+                                {
+                                    product.map((ürün, key) => {
+                                        if(kategori == ürün.ürün_kategori_adi) {
+                                            return (
+                                                <div id="myDropdown" style={{display:'none'}} key={key} className="dropdown-content">
+                                                    <a onClick={(e) => {
+                                                        this.changeProductName(e, ürün)
+                                                        }}>{ürün.ürün_adi}</a>
+                                                </div>
+                                            );
+                                        }
+                                    })   
+                                }
                         </div>
                     );
                 });
@@ -156,7 +157,11 @@ class Detail extends Component {
             )
             .then(res => console.log(res));
         }else {
-            console.log('ilker');
+            swal({
+                title: 'Lütfen bir ürün seçiniz',
+                type: 'error',
+                timer:1500
+              })
         }
         
         
@@ -182,25 +187,29 @@ class Detail extends Component {
     }
 
     detailListItemColor(e,item) {
-        var itemColor = e.target.style;
+        
+        if(e.target.tagName == 'LI') {
+            var itemColor = e.target.style;
 
-        if(itemColor.backgroundColor == '') {
-            itemColor.backgroundColor = '#FFDB4A';
-            itemColor.color = '#FFF';
+            if(itemColor.backgroundColor == '') {
+                itemColor.backgroundColor = '#FFDB4A';
+                itemColor.color = '#FFF';
 
-            this.setState({
-                detailListRemoveIndis:this.state.detailListRemoveIndis+1,
-                detailRemoveListTotal:this.state.detailRemoveListTotal+item.ürün_fiyat
-            })
-        }else {
-            itemColor.backgroundColor = '';
-            itemColor.color = 'black';
+                this.setState({
+                    detailListRemoveIndis:this.state.detailListRemoveIndis+1,
+                    detailRemoveListTotal:this.state.detailRemoveListTotal+item.siparis_fiyat
+                })
+            }else {
+                itemColor.backgroundColor = '';
+                itemColor.color = 'black';
 
-            this.setState({
-                detailListRemoveIndis:this.state.detailListRemoveIndis-1,
-                detailRemoveListTotal:this.state.detailRemoveListTotal-item.ürün_fiyat
-            })
+                this.setState({
+                    detailListRemoveIndis:this.state.detailListRemoveIndis-1,
+                    detailRemoveListTotal:this.state.detailRemoveListTotal-item.siparis_fiyat
+                })
+            }
         }
+        
     }
 
     removeDetailList() {
@@ -219,13 +228,43 @@ class Detail extends Component {
                 'x-access-token':localStorage.getItem('token')
              }
         })
-        .then(res => console.log(res));
+        .then(res => {
+            if(res.status === 200) {
+                swal({
+                    title: 'İşlem Başarılı',
+                    type: 'success',
+                    timer:1000
+                })
+            }
+        });
+    }
+
+    productCancel() {
+        var deskId = this.props.match.params.id;
+        console.log(deskId);
+        fetch(`http://localhost:3002/api/detail`, {
+             method:'put',
+             headers: {
+                'Content-Type':'application/x-www-form-urlencoded',
+                'x-access-token':localStorage.getItem('token')
+             },
+             body:`id=${encodeURI(deskId)}`
+        })
+        .then(res => {
+            console.log(res);
+        })
+    }
+    
+    orderCancel() {
+        this.setState({
+            productName:'',
+            productAdet:1,
+            productNot:''
+        })
     }
 
     componentDidMount() {
         this.getData();
-
-        <Navbar />
     }
 
      render() {
@@ -255,7 +294,14 @@ class Detail extends Component {
                             <hr />
                             <div className="product-button">
                                 <a onClick = {() => this.orderInsert()} class="button is-primary">Siparişi Onayla </a>
-                                <a class="button is-danger">Siparişi İptal Et</a>
+                                <a onClick = {() => this.orderCancel()} class="button is-danger">Siparişi İptal Et</a>
+                            </div>
+                            <div className="product-cancel">
+                                <a onClick={() => {
+                                    this.productCancel();
+                                    this.removeDetailList();
+                                }
+                                } class="button is-danger">Adisyonu Kapat</a>
                             </div>
                         </div>
                         <div className="column is-5" style={{height:'auto'}}>
@@ -276,15 +322,15 @@ class Detail extends Component {
                                                 return (
                                                     <li key = {key} onClick = {(e) => this.detailListItemColor(e,item)}>
 
-                                                        <div className="siparis_adet" style={{width:'30%'}}>
+                                                        <div className="siparis_adet" style={{width:'10%'}}>
                                                             <p disabled>{item.siparis_adet} Adet</p>
                                                         </div>
                                                             
-                                                        <div style={{width:'30%',display:'flex',justifyContent:'start'}} className="ürün_ad">
+                                                        <div style={{width:'10%',height:'100%',display:'flex',justifyContent:'start'}} className="ürün_ad">
                                                             <p disabled>{item.ürün_adi}</p>
                                                         </div>
 
-                                                         <div className="siparis_adet" style={{width:'30%',display:'flex',justifyContent:'flex-end'}}>
+                                                         <div className="siparis_adet" style={{width:'10%',display:'flex',justifyContent:'flex-end'}}>
                                                             <p>{item.siparis_fiyat} TL</p>
                                                         </div>
                                                        

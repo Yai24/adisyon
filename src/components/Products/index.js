@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Navbar from '../Navbar';
 import Menu from '../Menu';
 import ProductsStyle from './ProductsStyle.css';
+import Toggle from 'react-toggle';
 
 class Products extends Component {
 
@@ -10,26 +11,32 @@ class Products extends Component {
 
         this.state = {
             data: [] || {},
-            text:''
+            text:'',
+            biscuitIsReady:null
         }
 
         this.getData = this.getData.bind(this);
+        this.toggleButtonAction = this.toggleButtonAction.bind(this);
     }
 
     getData() {
-        fetch('http://localhost:3002/api/product', {
+        
+        if(localStorage.getItem('token') !== null) {
+            fetch('http://localhost:3002/api/product', {
             method:'GET',
             headers:{
                 'Content-Type':'application/x-www-form-urlencoded',
                 'x-access-token':localStorage.getItem('token')
             }
-        })
-        .then(res => res.json())
-        .then(data => {
-            this.setState({
-                data
             })
-        })
+            .then(res => res.json())
+            .then(data => {
+                this.setState({
+                    data,
+                    biscuitIsReady:data.ürün_stok_durum
+                })
+            })
+        }
     }
 
     getSearch(e) {
@@ -38,7 +45,15 @@ class Products extends Component {
         })
     }
 
+    toggleButtonAction(e) {
+        console.log(this.state.biscuitIsReady)
+    }
+
     componentDidMount() {
+        if(localStorage.getItem('token') === null) {
+            this.props.history.push('/');
+        }
+
         this.getData();
     }
 
@@ -47,8 +62,6 @@ class Products extends Component {
         const filteredData = this.state.data.filter(x => {
             return x.ürün_adi.toLowerCase().indexOf(this.state.text.toLowerCase()) !== -1
         })
-
-        console.log(filteredData);
 
         return(
             <div className='container is-fluid'>
@@ -88,10 +101,11 @@ class Products extends Component {
                                             <td>{x.ürün_kategori_adi}</td>
                                             <td>{x.ürün_fiyat} ₺ </td>  
                                             <td>
-                                            <label class="switch">
-                                                <input type="checkbox" checked />
-                                                <span class="slider round"></span>
-                                                </label>
+                                            <Toggle
+                                                id='biscuit-status'
+                                                defaultChecked={x.ürün_stok_durum == 'false' ? false : true}
+                                                aria-labelledby='biscuit-label'
+                                                onChange={this.toggleButtonAction} />
                                             </td>            
                                         </tr>
                                         )
