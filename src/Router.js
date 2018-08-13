@@ -7,6 +7,7 @@ import Admin from './admin';
 import Dashboard from './admin/Dashboard';
 import Login from './components/Login';
 import Products from './components/Products';
+import Reservation from './components/Reservation';
 
 class BrowserRouter extends Component {
     render() {
@@ -35,6 +36,12 @@ class BrowserRouter extends Component {
                     path="/products"
                     exact
                     component={Products}
+                />
+
+                <Route
+                    path="/reservation"
+                    exact
+                    component={Reservation}
                 />
 
                 <Route

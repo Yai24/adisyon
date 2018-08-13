@@ -24,7 +24,7 @@ class Menu extends Component {
                         </a>
                     </div>
                     <div className="column is-12">
-                        <a style={{height:'50px',width:'80%',marginLeft:'auto'}} className="button is-primary is-fullwidth "> 
+                        <a href='/reservation' style={{height:'50px',width:'80%',marginLeft:'auto'}} className="button is-primary is-fullwidth "> 
                             <div style={{width:'20%',display:'flex',alignItems:'center',justifyContent:'space-between',paddingRight:'30%'}}> 
                                 <i style={{marginRight:'10px'}} className="fas fa-check"></i>
                                 <span>Rezervasyonlar</span>
